@@ -1,17 +1,24 @@
-A song API
-returns artist, trackname and a link to the song
+# API Project
 
-To include:
-UUID
-Arist Name
-Track Name
-Link to the song (Spotify)
+A RESTful API built with Node.js and Express, serving as a simple song library management system.
 
-Stretch goals:
-middleware error handling
-adcanced routing query parameters (search by genre, rating, etc)
+## Objectives
 
-songs.json to be created
-3-5 songs each
-CRUD functions
-RESTful API event handlers
+- Build a REST API around a resource of your choice.
+- Work in a team using the Driver-Navigator/pair programming approach.
+- Practice planning before jumping into coding.
+- Deliver an MVP within a tight timeframe.
+
+## Technical Requirements
+
+- Programming Language: JavaScript
+- Environment: Node.js
+- Data Source: JSON file
+- Unique Identifier: Each resource entry should have a unique identifier generated using the uuid package.
+- Response Specification: All JSON responses should adhere to the JSend specification.
+
+## How to Use
+
+1. **Clone the Repository:**
+   ```bash
+   git clone https://github.com/dannykryan/soc4-buildAnAPI
