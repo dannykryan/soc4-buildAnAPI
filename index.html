@@ -1,13 +1,167 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
     <title>Team 3 Hackathon</title>
   </head>
   <body>
-    <h1>Team 3 Hackathon Friday</h1>
-    <script src="app.js"></script>
+
+    <h1>Song Library</h1>
+    <!-- Add Song Form -->
+    <form id="addForm">
+      <label for="artist">Artist:</label>
+      <input type="text" id="artist" name="artist" required>
+      <label for="song">Song:</label>
+      <input type="text" id="song" name="song" required>
+      <label for="link">Link:</label>
+      <input type="text" id="link" name="link">
+      <button type="submit">Add Song</button>
+    </form>
+    <!-- Song List -->
+    <ul id="songList"></ul>
+    <!-- Update Song Form -->
+    <form id="updateForm" style="display:none;">
+      <label for="updateArtist">Artist:</label>
+      <input type="text" id="updateArtist" name="updateArtist" required>
+      <label for="updateSong">Song:</label>
+      <input type="text" id="updateSong" name="updateSong" required>
+      <label for="updateLink">Link:</label>
+      <input type="text" id="updateLink" name="updateLink">
+      <input type="hidden" id="updateSongId" name="updateSongId">
+      <button type="submit">Update Song</button>
+    </form>
+
+    <script>
+      const addForm = document.getElementById('addForm');
+      const updateForm = document.getElementById('updateForm');
+      const songList = document.getElementById('songList');
+  
+      // Function to display songs in the list
+      function displaySongs(songs) {
+        songList.innerHTML = '';
+        songs.forEach(song => {
+          const listItem = document.createElement('li');
+          listItem.innerHTML = `
+            <div>
+              <strong>${song.artist}</strong> - ${song.song} (${song.link || 'No link'})
+            </div>
+            <div>
+              <button class="delete" onclick="deleteSong('${song.id}')">Delete</button>
+              <button onclick="showUpdateForm('${song.id}', '${song.artist}', '${song.song}', '${song.link || ''}')">Update</button>
+            </div>
+          `;
+          songList.appendChild(listItem);
+        });
+      }
+  
+      // Function to show the update form with pre-filled values
+      function showUpdateForm(id, artist, song, link) {
+        updateForm.style.display = 'block';
+        addForm.style.display = 'none';
+  
+        document.getElementById('updateArtist').value = artist;
+        document.getElementById('updateSong').value = song;
+        document.getElementById('updateLink').value = link;
+        document.getElementById('updateSongId').value = id;
+      }
+  
+      // Function to hide the update form and show the add form
+      function hideUpdateForm() {
+        updateForm.style.display = 'none';
+        addForm.style.display = 'block';
+  
+        // Clear update form values
+        document.getElementById('updateArtist').value = '';
+        document.getElementById('updateSong').value = '';
+        document.getElementById('updateLink').value = '';
+        document.getElementById('updateSongId').value = '';
+      }
+  
+      // Function to handle form submission for adding a song
+      addForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+  
+        const artist = document.getElementById('artist').value;
+        const song = document.getElementById('song').value;
+        const link = document.getElementById('link').value;
+  
+        // Make API request to add a new song
+        const response = await fetch('http://localhost:4000/songs', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            artist,
+            song,
+            link,
+          }),
+        });
+  
+        // Refresh song list after adding a new song
+        const songs = await response.json();
+        displaySongs(songs.data);
+  
+        // Clear add form values
+        document.getElementById('artist').value = '';
+        document.getElementById('song').value = '';
+        document.getElementById('link').value = '';
+      });
+  
+      // Function to handle form submission for updating a song
+      updateForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+  
+        const id = document.getElementById('updateSongId').value;
+        const artist = document.getElementById('updateArtist').value;
+        const song = document.getElementById('updateSong').value;
+        const link = document.getElementById('updateLink').value;
+  
+        // Make API request to update the song
+        const response = await fetch(`http://localhost:4000/songs/${id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            artist,
+            song,
+            link,
+          }),
+        });
+  
+        // Refresh song list after updating a song
+        const songs = await response.json();
+        displaySongs(songs.data);
+  
+        // Hide update form after submission
+        hideUpdateForm();
+      });
+  
+      // Function to handle song deletion
+      async function deleteSong(id) {
+        // Make API request to delete the song
+        const response = await fetch(`http://localhost:4000/songs/${id}`, {
+          method: 'DELETE',
+        });
+  
+        // Refresh song list after deleting a song
+        const songs = await response.json();
+        displaySongs(songs.data);
+      }
+  
+      // Function to fetch and display songs on page load
+      async function init() {
+        const response = await fetch('http://localhost:4000/songs');
+        const songs = await response.json();
+        displaySongs(songs.data);
+      }
+  
+      // Call init function to fetch and display songs on page load
+      init();
+    </script>
+
   </body>
 </html>
